@@ -51,21 +51,25 @@ body {
 
 .sidebar li {
   margin: 15px 0;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.sidebar li:hover {
+.sidebar a {
+  display: block;
+  text-decoration: none;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
   background: #374151;
   color: #60a5fa;
 }
 
-.active {
+.sidebar a.active {
   background: #2563eb;
 }
-
 /* Content */
 
 .content {
@@ -116,4 +120,107 @@ body {
 .card h2 {
   color: white;
   font-size: 32px;
+}
+.page h1 {
+  margin-bottom: 25px;
+}
+
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #2d3748;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.customer-table th,
+.customer-table td {
+  padding: 15px;
+  text-align: left;
+}
+
+.customer-table th {
+  background: #2563eb;
+}
+
+.customer-table tr:nth-child(even) {
+  background: #374151;
+}
+
+.customer-table tr:hover {
+  background: #4b5563;
+}
+.sidebar a {
+  display: block;
+  text-decoration: none;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background: #374151;
+  color: #60a5fa;
+}
+
+.sidebar a.active {
+  background: #2563eb;
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 420px;
+  background: #1f2937;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+}
+
+.modal-content input {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #374151;
+  color: white;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
 }
