@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import SearchBar from "../components/customers/SearchBar";
+import CustomerTable from "../components/customers/CustomerTable";
+import CustomerModal from "../components/customers/CustomerModal";
 
 function Customers() {
-  const [customers, setCustomers] = useState([
+  const defaultCustomers = [
     {
       id: 1,
       name: "ABC Textiles",
@@ -23,10 +27,18 @@ function Customers() {
       city: "Mumbai",
       gst: "27AAAAA1111A1Z1",
     },
-  ]);
+  ];
+
+  const [customers, setCustomers] = useState(() => {
+    const savedCustomers = localStorage.getItem("customers");
+    return savedCustomers
+      ? JSON.parse(savedCustomers)
+      : defaultCustomers;
+  });
 
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const [newCustomer, setNewCustomer] = useState({
     name: "",
@@ -35,25 +47,43 @@ function Customers() {
     gst: "",
   });
 
-  // Add Customer
+  // Save customers to Local Storage
+  useEffect(() => {
+    localStorage.setItem(
+      "customers",
+      JSON.stringify(customers)
+    );
+  }, [customers]);
+
+  // Add or Update Customer
   const addCustomer = () => {
     if (
-      newCustomer.name === "" ||
-      newCustomer.phone === "" ||
-      newCustomer.city === "" ||
-      newCustomer.gst === ""
+      !newCustomer.name ||
+      !newCustomer.phone ||
+      !newCustomer.city ||
+      !newCustomer.gst
     ) {
       alert("Please fill all fields");
       return;
     }
 
-    setCustomers([
-      ...customers,
-      {
-        id: customers.length + 1,
-        ...newCustomer,
-      },
-    ]);
+    if (editingId !== null) {
+      setCustomers(
+        customers.map((customer) =>
+          customer.id === editingId
+            ? { ...customer, ...newCustomer }
+            : customer
+        )
+      );
+    } else {
+      setCustomers([
+        ...customers,
+        {
+          id: Date.now(),
+          ...newCustomer,
+        },
+      ]);
+    }
 
     setNewCustomer({
       name: "",
@@ -62,6 +92,7 @@ function Customers() {
       gst: "",
     });
 
+    setEditingId(null);
     setShowForm(false);
   };
 
@@ -73,156 +104,52 @@ function Customers() {
 
     if (confirmDelete) {
       setCustomers(
-        customers.filter((customer) => customer.id !== id)
+        customers.filter(
+          (customer) => customer.id !== id
+        )
       );
     }
+  };
+
+  // Edit Customer
+  const editCustomer = (customer) => {
+    setEditingId(customer.id);
+
+    setNewCustomer({
+      name: customer.name,
+      phone: customer.phone,
+      city: customer.city,
+      gst: customer.gst,
+    });
+
+    setShowForm(true);
   };
 
   return (
     <div className="page">
       <h1>Customers</h1>
 
-      <div className="customer-header">
-        <input
-          type="text"
-          placeholder="Search customer..."
-          className="search-box"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <SearchBar
+        search={search}
+        setSearch={setSearch}
+        setShowForm={setShowForm}
+      />
 
-        <button
-          className="add-btn"
-          onClick={() => setShowForm(true)}
-        >
-          + Add Customer
-        </button>
-      </div>
+      <CustomerTable
+        customers={customers}
+        search={search}
+        deleteCustomer={deleteCustomer}
+        editCustomer={editCustomer}
+      />
 
-      <table className="customer-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>City</th>
-            <th>GST</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {customers
-            .filter((customer) =>
-              customer.name
-                .toLowerCase()
-                .includes(search.toLowerCase())
-            )
-            .map((customer) => (
-              <tr key={customer.id}>
-                <td>{customer.name}</td>
-                <td>{customer.phone}</td>
-                <td>{customer.city}</td>
-                <td>{customer.gst}</td>
-
-                <td>
-                  <button className="edit-btn">
-                    Edit
-                  </button>
-
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      deleteCustomer(customer.id)
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-
-      {showForm && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Add Customer</h2>
-
-            <input
-              type="text"
-              placeholder="Customer Name"
-              value={newCustomer.name}
-              onChange={(e) =>
-                setNewCustomer({
-                  ...newCustomer,
-                  name: e.target.value,
-                })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={newCustomer.phone}
-              onChange={(e) =>
-                setNewCustomer({
-                  ...newCustomer,
-                  phone: e.target.value,
-                })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="City"
-              value={newCustomer.city}
-              onChange={(e) =>
-                setNewCustomer({
-                  ...newCustomer,
-                  city: e.target.value,
-                })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="GST Number"
-              value={newCustomer.gst}
-              onChange={(e) =>
-                setNewCustomer({
-                  ...newCustomer,
-                  gst: e.target.value,
-                })
-              }
-            />
-
-            <div className="modal-buttons">
-              <button
-                className="save-btn"
-                onClick={addCustomer}
-              >
-                Save
-              </button>
-
-              <button
-                className="cancel-btn"
-                onClick={() => {
-                  setShowForm(false);
-
-                  setNewCustomer({
-                    name: "",
-                    phone: "",
-                    city: "",
-                    gst: "",
-                  });
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomerModal
+        showForm={showForm}
+        setShowForm={setShowForm}
+        newCustomer={newCustomer}
+        setNewCustomer={setNewCustomer}
+        addCustomer={addCustomer}
+        editingId={editingId}
+      />
     </div>
   );
 }
